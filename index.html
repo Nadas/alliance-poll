@@ -382,6 +382,117 @@
             border: 1px solid #4a2a2a;
             text-align: center;
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #141414;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-content h2 {
+            color: #ffffff;
+            margin-bottom: 16px;
+            font-size: 1.3em;
+        }
+
+        .modal-content p {
+            color: #888;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .credential-display {
+            background: #1a1a1a;
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            border: 1px solid #262626;
+        }
+
+        .credential-display label {
+            display: block;
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+
+        .credential-display .value {
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        .confirmation-box {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #262626;
+        }
+
+        .confirmation-box h3 {
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .confirmation-box p {
+            color: #888;
+            margin-bottom: 16px;
+            font-size: 0.9em;
+        }
+
+        .confirmation-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .confirmation-actions button {
+            flex: 1;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #262626;
+        }
+
+        .btn-outline:hover {
+            background: #1a1a1a;
+        }
     </style>
 </head>
 <body>
@@ -458,11 +569,10 @@
 
                 <button class="btn btn-primary" id="submitBtn" onclick="submitVote()">Submit Your Vote</button>
 
-				<div class="results-section">
+                <div class="results-section" id="resultsSection" style="display: none;">
                     <div class="results-title">Current Results</div>
                     <div id="results"></div>
                 </div>
-				
             </div>
 
             <div id="errorScreen" style="display: none;">
@@ -475,15 +585,52 @@
         </div>
     </div>
 
+    <!-- Password Modal -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <h2>Poll Created Successfully!</h2>
+            <p><strong>Important:</strong> Save these credentials now. You'll need them to access the admin panel.</p>
+            
+            <div class="credential-display">
+                <label>Poll ID:</label>
+                <div class="value">
+                    <span id="modalPollId"></span>
+                    <button class="copy-btn" onclick="copyModalCredential('pollId')">Copy</button>
+                </div>
+            </div>
+
+            <div class="credential-display">
+                <label>Admin Password:</label>
+                <div class="value">
+                    <span id="modalPassword"></span>
+                    <button class="copy-btn" onclick="copyModalCredential('password')">Copy</button>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closePasswordModal()">Got it!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <h2>Confirm Your Vote</h2>
+            <p>You've selected <strong id="confirmSlotCount">0</strong> time slot(s). Once submitted, your vote will be recorded.</p>
+            
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeConfirmationModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmSubmitVote()">Confirm Vote</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, get, onValue, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-		import { firebaseConfig } from './firebase-config.js';
-
-        // IMPORTANT: Replace with your own Firebase configuration
-        // Get this from: Firebase Console > Project Settings > Your apps > SDK setup and configuration
-       
+        import { firebaseConfig } from './firebase-config.js';
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -566,11 +713,15 @@
                 description: description || 'Vote for your preferred play times',
                 createdAt: new Date().toISOString(),
                 votes: {},
-                adminPassword: generatePassword()
+                adminPassword: generatePassword(),
+                resultsVisible: false  // Results hidden by default
             };
 
             try {
                 await window.firebaseSet(pollRef, newPoll);
+                
+                // Show success message with password
+                showPasswordModal(pollId, newPoll.adminPassword);
                 
                 // Update URL and load poll
                 window.history.pushState({}, '', `?poll=${pollId}`);
@@ -664,7 +815,51 @@
         // Update poll display
         function updatePollDisplay() {
             renderTimeSlots();
-            updateResults();
+            
+            // Show/hide results based on resultsVisible setting
+            const resultsSection = document.getElementById('resultsSection');
+            if (pollData.resultsVisible) {
+                resultsSection.style.display = 'block';
+                updateResults();
+            } else {
+                resultsSection.style.display = 'none';
+            }
+        }
+
+        // Update results display
+        function updateResults() {
+            const resultsDiv = document.getElementById('results');
+            const votes = pollData.votes || {};
+            
+            if (Object.keys(votes).length === 0) {
+                resultsDiv.innerHTML = '<p style="color: #888; text-align: center;">No votes yet. Be the first to vote!</p>';
+                return;
+            }
+
+            const slotResults = timeSlots.map(slot => {
+                const voters = Object.entries(votes)
+                    .filter(([name, data]) => data.slots && data.slots.includes(slot.id))
+                    .map(([name]) => name);
+                
+                return {
+                    slot,
+                    voters,
+                    count: voters.length
+                };
+            }).sort((a, b) => b.count - a.count);
+
+            resultsDiv.innerHTML = slotResults.map(result => `
+                <div style="margin-bottom: 20px;">
+                    <div style="font-weight: 600; color: #ffffff; margin-bottom: 5px;">
+                        ${result.slot.label}: ${result.count} vote${result.count !== 1 ? 's' : ''}
+                    </div>
+                    ${result.voters.length > 0 ? `
+                        <div class="voter-list">
+                            ${result.voters.join(', ')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
         }
 
         // Render time slots
@@ -700,8 +895,8 @@
             }
         }
 
-        // Submit vote
-        window.submitVote = async function() {
+        // Submit vote - show confirmation first
+        window.submitVote = function() {
             const playerName = document.getElementById('playerName').value.trim();
             
             if (!playerName) {
@@ -713,6 +908,17 @@
                 showMessage('Please select at least one time slot!', 'error');
                 return;
             }
+
+            // Show confirmation modal
+            document.getElementById('confirmSlotCount').textContent = selectedSlots.size;
+            document.getElementById('confirmationModal').classList.add('active');
+        }
+
+        // Confirm and actually submit vote
+        window.confirmSubmitVote = async function() {
+            const playerName = document.getElementById('playerName').value.trim();
+            
+            closeConfirmationModal();
 
             try {
                 const voteRef = window.firebaseRef(window.firebaseDB, `polls/${currentPollId}/votes/${playerName}`);
@@ -734,40 +940,32 @@
             }
         }
 
-        // Update results display
-        function updateResults() {
-            const resultsDiv = document.getElementById('results');
-            const votes = pollData.votes || {};
+        // Show password modal after poll creation
+        function showPasswordModal(pollId, password) {
+            document.getElementById('modalPollId').textContent = pollId;
+            document.getElementById('modalPassword').textContent = password;
+            document.getElementById('passwordModal').classList.add('active');
+        }
+
+        // Close password modal
+        window.closePasswordModal = function() {
+            document.getElementById('passwordModal').classList.remove('active');
+        }
+
+        // Close confirmation modal
+        window.closeConfirmationModal = function() {
+            document.getElementById('confirmationModal').classList.remove('active');
+        }
+
+        // Copy modal credentials
+        window.copyModalCredential = function(type) {
+            const text = type === 'pollId' ? 
+                document.getElementById('modalPollId').textContent : 
+                document.getElementById('modalPassword').textContent;
             
-            if (Object.keys(votes).length === 0) {
-                resultsDiv.innerHTML = '<p style="color: #666; text-align: center;">No votes yet. Be the first to vote!</p>';
-                return;
-            }
-
-            const slotResults = timeSlots.map(slot => {
-                const voters = Object.entries(votes)
-                    .filter(([name, data]) => data.slots && data.slots.includes(slot.id))
-                    .map(([name]) => name);
-                
-                return {
-                    slot,
-                    voters,
-                    count: voters.length
-                };
-            }).sort((a, b) => b.count - a.count);
-
-            resultsDiv.innerHTML = slotResults.map(result => `
-                <div style="margin-bottom: 20px;">
-                    <div style="font-weight: 600; color: #333; margin-bottom: 5px;">
-                        ${result.slot.label}: ${result.count} vote${result.count !== 1 ? 's' : ''}
-                    </div>
-                    ${result.voters.length > 0 ? `
-                        <div class="voter-list">
-                            ${result.voters.join(', ')}
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
+            navigator.clipboard.writeText(text).then(() => {
+                showMessage(`${type === 'pollId' ? 'Poll ID' : 'Password'} copied to clipboard!`, 'success');
+            });
         }
 
         // Copy shareable link
