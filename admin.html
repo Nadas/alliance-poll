@@ -473,6 +473,7 @@
                     <button class="btn btn-success" onclick="exportData()">📊 Export Data (JSON)</button>
                     <button class="btn btn-info" onclick="exportCSV()">📄 Export CSV</button>
                     <button class="btn btn-secondary" onclick="location.reload()">🔄 Refresh Data</button>
+                    <button class="btn btn-info" id="toggleResultsBtn" onclick="toggleResultsVisibility()">Show Results to Voters</button>
                     <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Votes</button>
                 </div>
 
@@ -508,7 +509,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, get, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-		import { firebaseConfig } from './firebase-config.js';
+        import { firebaseConfig } from './firebase-config.js';
 
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
@@ -662,6 +663,9 @@
             const pollUrl = `${window.location.origin}${window.location.pathname}?poll=${currentPollId}`;
             document.getElementById('pollLink').textContent = pollUrl;
 
+            // Update results visibility button
+            updateToggleButton(pollData.resultsVisible || false);
+
             const votes = pollData.votes || {};
             const totalVoters = Object.keys(votes).length;
             let totalSlotVotes = 0;
@@ -763,6 +767,38 @@
                     console.error('Error deleting voter:', error);
                     showAdminMessage('Error deleting vote', 'error');
                 }
+            }
+        }
+
+        window.toggleResultsVisibility = async function() {
+            const newVisibility = !pollData.resultsVisible;
+            
+            try {
+                const pollRef = window.firebaseRef(window.firebaseDB, `polls/${currentPollId}/resultsVisible`);
+                await window.firebaseUpdate(window.firebaseRef(window.firebaseDB, `polls/${currentPollId}`), {
+                    resultsVisible: newVisibility
+                });
+                
+                showAdminMessage(
+                    newVisibility ? 'Results are now visible to voters' : 'Results are now hidden from voters', 
+                    'success'
+                );
+                
+                updateToggleButton(newVisibility);
+            } catch (error) {
+                console.error('Error toggling results visibility:', error);
+                showAdminMessage('Error updating visibility', 'error');
+            }
+        }
+
+        function updateToggleButton(visible) {
+            const btn = document.getElementById('toggleResultsBtn');
+            if (visible) {
+                btn.textContent = 'Hide Results from Voters';
+                btn.className = 'btn btn-secondary';
+            } else {
+                btn.textContent = 'Show Results to Voters';
+                btn.className = 'btn btn-info';
             }
         }
 
