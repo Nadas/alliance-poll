@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alliance Play Time Poll</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .create-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .create-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .poll-info {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .poll-info h3 {
+            color: #004085;
+            margin-bottom: 10px;
+        }
+
+        .poll-info p {
+            color: #004085;
+            margin-bottom: 10px;
+        }
+
+        .share-link {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .share-link input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #004085;
+            border-left: 4px solid #667eea;
+        }
+
+        .name-input-section {
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .name-input-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .name-input-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .name-input-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #timeSlots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .time-slot {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .time-slot:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .time-slot.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+        }
+
+        .time-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .time-label {
+            font-size: 0.95em;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .vote-count {
+            background: rgba(102, 126, 234, 0.15);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-align: center;
+        }
+
+        .time-slot.selected .vote-count {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .results-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .results-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .voter-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #5568d3;
+        }
+
+        .error-box {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #f5c6cb;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Alliance Play Time Poll</h1>
+            <p>Vote for your preferred gaming schedule</p>
+        </div>
+
+        <div class="content">
+            <div id="loadingScreen" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading...</p>
+            </div>
+
+            <!-- Create New Poll Section -->
+            <div id="createSection" style="display: none;">
+                <div class="create-section">
+                    <h2>Create a New Poll</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Start by providing details for your alliance poll.</p>
+                    
+                    <div class="form-group">
+                        <label for="allianceName">Alliance / Kingdom Name:</label>
+                        <input type="text" id="allianceName" placeholder="e.g., Elite Warriors" maxlength="50" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pollDescription">Poll Description:</label>
+                        <textarea id="pollDescription" placeholder="e.g., Vote for your preferred KvK battle times" maxlength="200"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="createPoll()">Create Poll</button>
+                </div>
+
+                <div class="divider">— OR —</div>
+
+                <div class="create-section">
+                    <h2>Join Existing Poll</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Already have a Poll ID? Enter it below.</p>
+                    
+                    <div class="form-group">
+                        <label for="pollIdInput">Poll ID:</label>
+                        <input type="text" id="pollIdInput" placeholder="Enter 6-character Poll ID" maxlength="6">
+                    </div>
+
+                    <button class="btn btn-success" onclick="joinPoll()">Join Poll</button>
+                </div>
+            </div>
+
+            <!-- Poll Screen -->
+            <div id="pollScreen" style="display: none;">
+                <div class="poll-info">
+                    <h3 id="pollTitle">Alliance Poll</h3>
+                    <p id="pollDesc"></p>
+                    <div class="share-link">
+                        <input type="text" id="shareableLink" readonly>
+                        <button class="copy-btn" onclick="copyLink()">Copy Link</button>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.9em;">Share this link with your alliance members!</p>
+                </div>
+
+                <div id="message"></div>
+
+                <div class="instructions">
+                    <strong>📋 Instructions:</strong> Enter your name and select all time slots when you're available to play.
+                </div>
+
+                <div class="name-input-section">
+                    <label for="playerName">Your Name / In-Game Name:</label>
+                    <input type="text" id="playerName" placeholder="Enter your name..." maxlength="50">
+                </div>
+
+                <div id="timeSlots"></div>
+
+                <button class="btn btn-primary" id="submitBtn" onclick="submitVote()">Submit Your Vote</button>
+
+                <div class="results-section">
+                    <div class="results-title">📊 Current Results</div>
+                    <div id="results"></div>
+                </div>
+            </div>
+
+            <div id="errorScreen" style="display: none;">
+                <div class="error-box">
+                    <h3>Poll Not Found</h3>
+                    <p>The poll you're looking for doesn't exist or has been deleted.</p>
+                    <button class="btn btn-primary" onclick="location.href = window.location.pathname" style="margin-top: 20px; width: auto;">Go Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get, onValue, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // IMPORTANT: Replace with your own Firebase configuration
+        // Get this from: Firebase Console > Project Settings > Your apps > SDK setup and configuration
+        const firebaseConfig = {
+		  apiKey: "AIzaSyDZzaHwUeuFdaH-3HnlnNspe8eu9nWQAk8",
+		  authDomain: "ks-bear-trap.firebaseapp.com",
+		  projectId: "ks-bear-trap",
+		  storageBucket: "ks-bear-trap.firebasestorage.app",
+		  messagingSenderId: "436880009222",
+		  appId: "1:436880009222:web:e39b0598cdd49c8840bb87",
+		  measurementId: "G-EJ3L8DBDTX"
+		};
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Make Firebase available globally
+        window.firebaseDB = database;
+        window.firebaseRef = ref;
+        window.firebaseSet = set;
+        window.firebaseGet = get;
+        window.firebaseOnValue = onValue;
+        window.firebaseUpdate = update;
+
+        // Initialize app
+        window.initializeApp();
+    </script>
+
+    <script>
+        let currentPollId = null;
+        let selectedSlots = new Set();
+        let pollData = null;
+
+        // Generate 48 time slots (30 minutes each)
+        const timeSlots = [];
+        for (let i = 0; i < 48; i++) {
+            const startHour = Math.floor(i / 2);
+            const startMin = (i % 2) * 30;
+            const endHour = Math.floor((i + 1) / 2);
+            const endMin = ((i + 1) % 2) * 30;
+            
+            const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+            const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+            
+            timeSlots.push({
+                id: i + 1,
+                label: `${startTime} - ${endTime}`,
+                time: `${startTime}-${endTime}`
+            });
+        }
+
+        // Initialize application
+        window.initializeApp = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pollId = urlParams.get('poll');
+
+            if (pollId) {
+                currentPollId = pollId;
+                loadPoll(pollId);
+            } else {
+                showCreateSection();
+            }
+        }
+
+        // Generate unique poll ID
+        function generatePollId() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let id = '';
+            for (let i = 0; i < 6; i++) {
+                id += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return id;
+        }
+
+        // Create new poll
+        window.createPoll = async function() {
+            const allianceName = document.getElementById('allianceName').value.trim();
+            const description = document.getElementById('pollDescription').value.trim();
+
+            if (!allianceName) {
+                showMessage('Please enter an alliance name!', 'error');
+                return;
+            }
+
+            const pollId = generatePollId();
+            const pollRef = window.firebaseRef(window.firebaseDB, `polls/${pollId}`);
+
+            const newPoll = {
+                id: pollId,
+                allianceName: allianceName,
+                description: description || 'Vote for your preferred play times',
+                createdAt: new Date().toISOString(),
+                votes: {},
+                adminPassword: generatePassword()
+            };
+
+            try {
+                await window.firebaseSet(pollRef, newPoll);
+                
+                // Update URL and load poll
+                window.history.pushState({}, '', `?poll=${pollId}`);
+                currentPollId = pollId;
+                loadPoll(pollId);
+            } catch (error) {
+                console.error('Error creating poll:', error);
+                showMessage('Error creating poll. Please try again.', 'error');
+            }
+        }
+
+        // Join existing poll
+        window.joinPoll = function() {
+            const pollId = document.getElementById('pollIdInput').value.trim().toUpperCase();
+            
+            if (!pollId || pollId.length !== 6) {
+                showMessage('Please enter a valid 6-character Poll ID!', 'error');
+                return;
+            }
+
+            window.history.pushState({}, '', `?poll=${pollId}`);
+            currentPollId = pollId;
+            loadPoll(pollId);
+        }
+
+        // Load poll data
+        async function loadPoll(pollId) {
+            showLoadingScreen();
+
+            try {
+                const pollRef = window.firebaseRef(window.firebaseDB, `polls/${pollId}`);
+                const snapshot = await window.firebaseGet(pollRef);
+
+                if (snapshot.exists()) {
+                    pollData = snapshot.val();
+                    
+                    // Listen for real-time updates
+                    window.firebaseOnValue(pollRef, (snapshot) => {
+                        if (snapshot.exists()) {
+                            pollData = snapshot.val();
+                            updatePollDisplay();
+                        }
+                    });
+
+                    showPollScreen();
+                } else {
+                    showErrorScreen();
+                }
+            } catch (error) {
+                console.error('Error loading poll:', error);
+                showErrorScreen();
+            }
+        }
+
+        // Show different screens
+        function showLoadingScreen() {
+            document.getElementById('loadingScreen').style.display = 'block';
+            document.getElementById('createSection').style.display = 'none';
+            document.getElementById('pollScreen').style.display = 'none';
+            document.getElementById('errorScreen').style.display = 'none';
+        }
+
+        function showCreateSection() {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('createSection').style.display = 'block';
+            document.getElementById('pollScreen').style.display = 'none';
+            document.getElementById('errorScreen').style.display = 'none';
+        }
+
+        function showPollScreen() {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('createSection').style.display = 'none';
+            document.getElementById('pollScreen').style.display = 'block';
+            document.getElementById('errorScreen').style.display = 'none';
+
+            // Update poll info
+            document.getElementById('pollTitle').textContent = pollData.allianceName;
+            document.getElementById('pollDesc').textContent = pollData.description;
+            document.getElementById('shareableLink').value = window.location.href;
+
+            updatePollDisplay();
+        }
+
+        function showErrorScreen() {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('createSection').style.display = 'none';
+            document.getElementById('pollScreen').style.display = 'none';
+            document.getElementById('errorScreen').style.display = 'block';
+        }
+
+        // Update poll display
+        function updatePollDisplay() {
+            renderTimeSlots();
+            updateResults();
+        }
+
+        // Render time slots
+        function renderTimeSlots() {
+            const container = document.getElementById('timeSlots');
+            const votes = pollData.votes || {};
+            
+            container.innerHTML = timeSlots.map(slot => {
+                const voteCount = Object.values(votes).filter(v => v.slots && v.slots.includes(slot.id)).length;
+                const isSelected = selectedSlots.has(slot.id);
+
+                return `
+                    <div class="time-slot ${isSelected ? 'selected' : ''}" id="slot-${slot.id}" onclick="toggleSlot(${slot.id})">
+                        <div class="time-info">
+                            <span class="time-label">${slot.label}</span>
+                            <span class="vote-count">${voteCount} vote${voteCount !== 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle time slot selection
+        window.toggleSlot = function(slotId) {
+            const slotElement = document.getElementById(`slot-${slotId}`);
+            
+            if (selectedSlots.has(slotId)) {
+                selectedSlots.delete(slotId);
+                slotElement.classList.remove('selected');
+            } else {
+                selectedSlots.add(slotId);
+                slotElement.classList.add('selected');
+            }
+        }
+
+        // Submit vote
+        window.submitVote = async function() {
+            const playerName = document.getElementById('playerName').value.trim();
+            
+            if (!playerName) {
+                showMessage('Please enter your name!', 'error');
+                return;
+            }
+
+            if (selectedSlots.size === 0) {
+                showMessage('Please select at least one time slot!', 'error');
+                return;
+            }
+
+            try {
+                const voteRef = window.firebaseRef(window.firebaseDB, `polls/${currentPollId}/votes/${playerName}`);
+                await window.firebaseSet(voteRef, {
+                    slots: Array.from(selectedSlots),
+                    timestamp: new Date().toISOString()
+                });
+
+                showMessage(`✅ Thank you, ${playerName}! Your vote has been recorded.`, 'success');
+                
+                // Reset form
+                document.getElementById('playerName').value = '';
+                selectedSlots.clear();
+                
+                renderTimeSlots();
+            } catch (error) {
+                console.error('Error submitting vote:', error);
+                showMessage('Error submitting vote. Please try again.', 'error');
+            }
+        }
+
+        // Update results display
+        function updateResults() {
+            const resultsDiv = document.getElementById('results');
+            const votes = pollData.votes || {};
+            
+            if (Object.keys(votes).length === 0) {
+                resultsDiv.innerHTML = '<p style="color: #666; text-align: center;">No votes yet. Be the first to vote!</p>';
+                return;
+            }
+
+            const slotResults = timeSlots.map(slot => {
+                const voters = Object.entries(votes)
+                    .filter(([name, data]) => data.slots && data.slots.includes(slot.id))
+                    .map(([name]) => name);
+                
+                return {
+                    slot,
+                    voters,
+                    count: voters.length
+                };
+            }).sort((a, b) => b.count - a.count);
+
+            resultsDiv.innerHTML = slotResults.map(result => `
+                <div style="margin-bottom: 20px;">
+                    <div style="font-weight: 600; color: #333; margin-bottom: 5px;">
+                        ${result.slot.label}: ${result.count} vote${result.count !== 1 ? 's' : ''}
+                    </div>
+                    ${result.voters.length > 0 ? `
+                        <div class="voter-list">
+                            👥 ${result.voters.join(', ')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Copy shareable link
+        window.copyLink = function() {
+            const linkInput = document.getElementById('shareableLink');
+            linkInput.select();
+            document.execCommand('copy');
+            showMessage('Link copied to clipboard!', 'success');
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            setTimeout(() => {
+                messageDiv.className = '';
+                messageDiv.textContent = '';
+            }, 5000);
+        }
+
+        // Generate admin password
+        function generatePassword() {
+            const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+            let password = '';
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+    </script>
+</body>
+</html>
