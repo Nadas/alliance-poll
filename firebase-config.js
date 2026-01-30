@@ -3,14 +3,14 @@
 // Get these from: Firebase Console > Project Settings > Your apps > SDK setup and configuration
 
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
+		  apiKey: "AIzaSyDZzaHwUeuFdaH-3HnlnNspe8eu9nWQAk8",
+		  authDomain: "ks-bear-trap.firebaseapp.com",
+		  projectId: "ks-bear-trap",
+		  storageBucket: "ks-bear-trap.firebasestorage.app",
+		  messagingSenderId: "436880009222",
+		  appId: "1:436880009222:web:e39b0598cdd49c8840bb87",
+		  measurementId: "G-EJ3L8DBDTX"
+		};
 
 // Export for use in other files
 export { firebaseConfig };
