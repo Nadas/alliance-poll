@@ -36,7 +36,6 @@
             background: #141414;
             border-bottom: 1px solid #262626;
             padding: 24px 30px;
-            position: relative;
         }
 
         .header h1 {
@@ -494,23 +493,6 @@
         .btn-outline:hover {
             background: #1a1a1a;
         }
-
-        .admin-link {
-            position: absolute;
-            top: 24px;
-            right: 30px;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 6px 12px;
-            border: 1px solid #262626;
-            border-radius: 4px;
-            font-size: 0.85em;
-            transition: background 0.2s ease;
-        }
-
-        .admin-link:hover {
-            background: #1a1a1a;
-        }
     </style>
 </head>
 <body>
@@ -518,7 +500,6 @@
         <div class="header">
             <h1>Alliance Play Time Poll</h1>
             <p>Vote for your preferred gaming schedule</p>
-            <a href="admin.html" class="admin-link">Admin</a>
         </div>
 
         <div class="content">
@@ -528,7 +509,7 @@
             </div>
 
              
-            <div class="create-section">
+            <div class="create-section" id="joinSection">
                 <h2>Join Existing Poll</h2>
                 <p style="color: #666; margin-bottom: 20px;">Already have a Poll ID? Enter it below.</p>
                     
@@ -799,23 +780,29 @@
         // Show different screens
         function showLoadingScreen() {
             document.getElementById('loadingScreen').style.display = 'block';
+            document.getElementById('joinSection').style.display = 'none';
             document.getElementById('createSection').style.display = 'none';
             document.getElementById('pollScreen').style.display = 'none';
             document.getElementById('errorScreen').style.display = 'none';
+            document.querySelector('.divider').style.display = 'none';
         }
 
         function showCreateSection() {
             document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('joinSection').style.display = 'block';
             document.getElementById('createSection').style.display = 'block';
             document.getElementById('pollScreen').style.display = 'none';
             document.getElementById('errorScreen').style.display = 'none';
+            document.querySelector('.divider').style.display = 'block';
         }
 
         function showPollScreen() {
             document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('joinSection').style.display = 'none';
             document.getElementById('createSection').style.display = 'none';
             document.getElementById('pollScreen').style.display = 'block';
             document.getElementById('errorScreen').style.display = 'none';
+            document.querySelector('.divider').style.display = 'none';
 
             // Update poll info
             document.getElementById('pollTitle').textContent = pollData.allianceName;
@@ -827,9 +814,11 @@
 
         function showErrorScreen() {
             document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('joinSection').style.display = 'none';
             document.getElementById('createSection').style.display = 'none';
             document.getElementById('pollScreen').style.display = 'none';
             document.getElementById('errorScreen').style.display = 'block';
+            document.querySelector('.divider').style.display = 'none';
         }
 
         // Update poll display
