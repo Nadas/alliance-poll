@@ -508,6 +508,21 @@
                 <p>Loading...</p>
             </div>
 
+             
+            <div class="create-section">
+                <h2>Join Existing Poll</h2>
+                <p style="color: #666; margin-bottom: 20px;">Already have a Poll ID? Enter it below.</p>
+                    
+                <div class="form-group">
+                      <label for="pollIdInput">Poll ID:</label>
+                     <input type="text" id="pollIdInput" placeholder="Enter 6-character Poll ID" maxlength="6">
+                </div>
+
+                 <button class="btn btn-success" onclick="joinPoll()">Join Poll</button>
+            </div>
+            
+            <div class="divider">— OR —</div>
+            
             <!-- Create New Poll Section -->
             <div id="createSection" style="display: none;">
                 <div class="create-section">
@@ -515,30 +530,16 @@
                     <p style="color: #666; margin-bottom: 20px;">Start by providing details for your alliance poll.</p>
                     
                     <div class="form-group">
-                        <label for="allianceName">Alliance / Kingdom Name:</label>
-                        <input type="text" id="allianceName" placeholder="e.g., Elite Warriors" maxlength="50" required>
+                        <label for="allianceName">Alliance Name:</label>
+                        <input type="text" id="allianceName" placeholder="e.g., KLS" maxlength="50" required>
                     </div>
 
                     <div class="form-group">
                         <label for="pollDescription">Poll Description:</label>
-                        <textarea id="pollDescription" placeholder="e.g., Vote for your preferred KvK battle times" maxlength="200"></textarea>
+                        <textarea id="pollDescription" placeholder="e.g., Vote for your preferred play times" maxlength="200"></textarea>
                     </div>
 
                     <button class="btn btn-primary" onclick="createPoll()">Create Poll</button>
-                </div>
-
-                <div class="divider">— OR —</div>
-
-                <div class="create-section">
-                    <h2>Join Existing Poll</h2>
-                    <p style="color: #666; margin-bottom: 20px;">Already have a Poll ID? Enter it below.</p>
-                    
-                    <div class="form-group">
-                        <label for="pollIdInput">Poll ID:</label>
-                        <input type="text" id="pollIdInput" placeholder="Enter 6-character Poll ID" maxlength="6">
-                    </div>
-
-                    <button class="btn btn-success" onclick="joinPoll()">Join Poll</button>
                 </div>
             </div>
 
@@ -561,7 +562,7 @@
                 </div>
 
                 <div class="name-input-section">
-                    <label for="playerName">Your Name / In-Game Name:</label>
+                    <label for="playerName">Your In-Game Name:</label>
                     <input type="text" id="playerName" placeholder="Enter your name..." maxlength="50">
                 </div>
 
