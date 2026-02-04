@@ -756,7 +756,7 @@
 
                 return `
                     <div class="heatmap-cell" style="background: ${bgColor}; color: ${textColor};">
-                        <div class="heatmap-time">${slot.time}</div>
+                        <div class="heatmap-time">${slot.time.split('-')[0]}</div>
                         <div class="heatmap-votes">${votes}</div>
                     </div>
                 `;
