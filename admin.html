@@ -504,26 +504,25 @@
                         <div class="stat-number" id="mostPopularTime">--:--</div>
                         <div class="stat-label">Most Popular Time</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="secondPopularTime">--:--</div>
-                        <div class="stat-label" id="secondPopularLabel">2nd Most Popular</div>
-                    </div>
                 </div>
 
                 <div class="action-buttons">
-                    <button class="btn btn-success" onclick="exportData()">Export Data (JSON)</button>
-                    <button class="btn btn-info" onclick="exportCSV()">Export Data (CSV)</button>
+                    <button class="btn btn-success" onclick="exportData()">📊 Export Data (JSON)</button>
+                    <button class="btn btn-info" onclick="exportCSV()">📄 Export CSV</button>
+                    <button class="btn btn-secondary" onclick="location.reload()">🔄 Refresh Data</button>
+                    <button class="btn btn-info" id="toggleResultsBtn" onclick="toggleResultsVisibility()">Show Results to Voters</button>
+                    <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Votes</button>
                 </div>
 
                 <div class="section">
-                    <div class="section-title">Time Slot Heatmap</div>
+                    <div class="section-title">🔥 Time Slot Heatmap</div>
                     <div class="heatmap-container">
                         <div class="heatmap" id="heatmap"></div>
                     </div>
                 </div>
 
                 <div class="section">
-                    <div class="section-title">Voter Details</div>
+                    <div class="section-title">👥 Voter Details</div>
                     <div style="overflow-x: auto;">
                         <table class="voter-table">
                             <thead>
