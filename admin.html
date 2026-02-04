@@ -202,46 +202,45 @@
         }
 
         .credentials-box {
-            background: #2a2a1a;
-            border: 1px solid #4a4a2a;
-            border-radius: 8px;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 30px;
         }
 
         .credentials-box h3 {
-            color: #ffc107;
+            color: #856404;
             margin-bottom: 15px;
         }
 
         .credential-item {
-            background: #1a1a1a;
+            background: white;
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid #262626;
         }
 
         .credential-label {
             font-weight: 600;
-            color: #e0e0e0;
+            color: #333;
         }
 
         .credential-value {
             font-family: 'Courier New', monospace;
-            background: #0a0a0a;
+            background: #f8f9fa;
             padding: 8px 12px;
             border-radius: 6px;
-            color: #ffffff;
+            color: #667eea;
             font-size: 1.1em;
         }
 
         .copy-btn {
-            background: #ffffff;
-            color: #0a0a0a;
+            background: #667eea;
+            color: white;
             border: none;
             padding: 6px 12px;
             border-radius: 6px;
@@ -251,7 +250,7 @@
         }
 
         .copy-btn:hover {
-            opacity: 0.9;
+            background: #5568d3;
         }
 
         .stats-grid {
@@ -283,18 +282,17 @@
         }
 
         .section {
-            background: #1a1a1a;
+            background: #f8f9fa;
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 20px;
-            border: 1px solid #262626;
         }
 
         .section-title {
             font-size: 1.3em;
             font-weight: 600;
             margin-bottom: 15px;
-            color: #ffffff;
+            color: #333;
         }
 
         .action-buttons {
@@ -342,7 +340,7 @@
         }
 
         .heatmap-container {
-            background: #141414;
+            background: white;
             padding: 20px;
             border-radius: 8px;
             overflow-x: auto;
@@ -390,41 +388,37 @@
         }
 
         .message.success {
-            background: #1a3a1a;
-            color: #4ade80;
-            border: 1px solid #2a4a2a;
+            background: #d4edda;
+            color: #155724;
         }
 
         .message.error {
-            background: #3a1a1a;
-            color: #f87171;
-            border: 1px solid #4a2a2a;
+            background: #f8d7da;
+            color: #721c24;
         }
 
         .poll-info-box {
-            background: #1a1a1a;
+            background: #e7f3ff;
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 30px;
-            border-left: 4px solid #ffffff;
-            border: 1px solid #262626;
+            border-left: 4px solid #667eea;
         }
 
         .poll-info-box h3 {
-            color: #ffffff;
+            color: #004085;
             margin-bottom: 10px;
         }
 
         .poll-link {
-            background: #0a0a0a;
+            background: white;
             padding: 12px;
             border-radius: 8px;
             margin-top: 10px;
             font-family: 'Courier New', monospace;
-            color: #e0e0e0;
+            color: #667eea;
             font-weight: 600;
             word-break: break-all;
-            border: 1px solid #262626;
         }
     </style>
 </head>
@@ -434,6 +428,7 @@
             <h1>Admin Panel</h1>
             <p>Alliance Play Time Poll Management</p>
             <button class="logout-btn" id="logoutBtn" style="display: none;" onclick="logout()">Logout</button>
+            <a href="index.html" class="home-link">Home</a>
         </div>
 
         <div class="content">
@@ -502,16 +497,18 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="mostPopularTime">--:--</div>
-                        <div class="stat-label">Most Popular Time</div>
+                        <div class="stat-label" id="mostPopularLabel">Most Popular Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="secondPopularTime">--:--</div>
+                        <div class="stat-label" id="secondPopularLabel">2nd Most Popular</div>
                     </div>
                 </div>
 
                 <div class="action-buttons">
-                    <button class="btn btn-success" onclick="exportData()">📊 Export Data (JSON)</button>
-                    <button class="btn btn-info" onclick="exportCSV()">📄 Export CSV</button>
-                    <button class="btn btn-secondary" onclick="location.reload()">🔄 Refresh Data</button>
-                    <button class="btn btn-info" id="toggleResultsBtn" onclick="toggleResultsVisibility()">Show Results to Voters</button>
-                    <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Votes</button>
+                    <button class="btn btn-success" onclick="exportData()">Export Data (JSON)</button>
+                    <button class="btn btn-info" onclick="exportCSV()">Export CSV</button>
+                    <button class="btn btn-danger" onclick="clearAllData()">Clear All Votes</button>
                 </div>
 
                 <div class="section">
@@ -700,9 +697,6 @@
             const pollUrl = `${window.location.origin}${window.location.pathname}?poll=${currentPollId}`;
             document.getElementById('pollLink').textContent = pollUrl;
 
-            // Update results visibility button
-            updateToggleButton(pollData.resultsVisible || false);
-
             const votes = pollData.votes || {};
             const totalVoters = Object.keys(votes).length;
             let totalSlotVotes = 0;
@@ -721,21 +715,38 @@
                 }
             });
 
-            let maxVotes = 0;
-            let mostPopularSlot = null;
-            Object.entries(slotCounts).forEach(([slotId, count]) => {
-                if (count > maxVotes) {
-                    maxVotes = count;
-                    mostPopularSlot = parseInt(slotId);
-                }
-            });
+            // Find top 2 most popular times
+            const sortedSlots = Object.entries(slotCounts)
+                .sort(([, a], [, b]) => b - a)
+                .filter(([, count]) => count > 0);
 
-            const mostPopularTime = mostPopularSlot ? 
-                timeSlots[mostPopularSlot - 1].time.split('-')[0] : '--:--';
+            const mostPopularSlot = sortedSlots[0];
+            const secondPopularSlot = sortedSlots[1];
+
+            if (mostPopularSlot) {
+                const slotId = parseInt(mostPopularSlot[0]);
+                const voteCount = mostPopularSlot[1];
+                const slot = timeSlots[slotId - 1];
+                document.getElementById('mostPopularTime').textContent = slot.label;
+                document.getElementById('mostPopularLabel').textContent = `Most Popular (${voteCount} votes)`;
+            } else {
+                document.getElementById('mostPopularTime').textContent = '--:--';
+                document.getElementById('mostPopularLabel').textContent = 'Most Popular Time';
+            }
+
+            if (secondPopularSlot) {
+                const slotId = parseInt(secondPopularSlot[0]);
+                const voteCount = secondPopularSlot[1];
+                const slot = timeSlots[slotId - 1];
+                document.getElementById('secondPopularTime').textContent = slot.label;
+                document.getElementById('secondPopularLabel').textContent = `2nd Most Popular (${voteCount} votes)`;
+            } else {
+                document.getElementById('secondPopularTime').textContent = '--:--';
+                document.getElementById('secondPopularLabel').textContent = '2nd Most Popular';
+            }
 
             document.getElementById('totalVoters').textContent = totalVoters;
             document.getElementById('totalVotes').textContent = totalSlotVotes;
-            document.getElementById('mostPopularTime').textContent = mostPopularTime;
 
             generateHeatmap(slotCounts, totalVoters);
             generateVoterTable(votes);
@@ -749,13 +760,13 @@
                 const votes = slotCounts[slot.id] || 0;
                 const intensity = maxVotes > 0 ? votes / maxVotes : 0;
                 const bgColor = intensity > 0 ? 
-                    `rgba(102, 126, 234, ${0.2 + intensity * 0.8})` : 
-                    '#f8f9fa';
-                const textColor = intensity > 0.5 ? 'white' : '#333';
+                    `rgba(255, 255, 255, ${0.1 + intensity * 0.3})` : 
+                    '#1a1a1a';
+                const textColor = intensity > 0.5 ? '#ffffff' : '#888';
 
                 return `
                     <div class="heatmap-cell" style="background: ${bgColor}; color: ${textColor};">
-                        <div class="heatmap-time">${slot.time.split('-')[0]}</div>
+                        <div class="heatmap-time">${slot.label}</div>
                         <div class="heatmap-votes">${votes}</div>
                     </div>
                 `;
@@ -766,7 +777,7 @@
             const tbody = document.getElementById('voterTableBody');
 
             if (Object.keys(votes).length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">No votes yet</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #888;">No votes yet</td></tr>';
                 return;
             }
 
@@ -775,7 +786,7 @@
                 
                 const selectedTimes = data.slots.map(slotId => {
                     const slot = timeSlots[slotId - 1];
-                    return `<span class="time-badge">${slot.time}</span>`;
+                    return `<span class="time-badge">${slot.label}</span>`;
                 }).join(' ');
 
                 const voteTime = new Date(data.timestamp).toLocaleString();
@@ -804,38 +815,6 @@
                     console.error('Error deleting voter:', error);
                     showAdminMessage('Error deleting vote', 'error');
                 }
-            }
-        }
-
-        window.toggleResultsVisibility = async function() {
-            const newVisibility = !pollData.resultsVisible;
-            
-            try {
-                const pollRef = window.firebaseRef(window.firebaseDB, `polls/${currentPollId}/resultsVisible`);
-                await window.firebaseUpdate(window.firebaseRef(window.firebaseDB, `polls/${currentPollId}`), {
-                    resultsVisible: newVisibility
-                });
-                
-                showAdminMessage(
-                    newVisibility ? 'Results are now visible to voters' : 'Results are now hidden from voters', 
-                    'success'
-                );
-                
-                updateToggleButton(newVisibility);
-            } catch (error) {
-                console.error('Error toggling results visibility:', error);
-                showAdminMessage('Error updating visibility', 'error');
-            }
-        }
-
-        function updateToggleButton(visible) {
-            const btn = document.getElementById('toggleResultsBtn');
-            if (visible) {
-                btn.textContent = 'Hide Results from Voters';
-                btn.className = 'btn btn-secondary';
-            } else {
-                btn.textContent = 'Show Results to Voters';
-                btn.className = 'btn btn-info';
             }
         }
 
