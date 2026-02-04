@@ -54,7 +54,7 @@
         .logout-btn {
             position: absolute;
             top: 24px;
-            right: 30px;
+            right: 90px;
             padding: 6px 12px;
             background: #ffffff;
             color: #0a0a0a;
@@ -66,6 +66,23 @@
 
         .logout-btn:hover {
             opacity: 0.9;
+        }
+
+        .home-link {
+            position: absolute;
+            top: 24px;
+            right: 30px;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 6px 12px;
+            border: 1px solid #262626;
+            border-radius: 4px;
+            font-size: 0.85em;
+            transition: background 0.2s ease;
+        }
+
+        .home-link:hover {
+            background: #1a1a1a;
         }
 
         .content {
@@ -100,15 +117,15 @@
         }
 
         .login-box {
-            background: #f8f9fa;
+            background: #1a1a1a;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            border: 1px solid #262626;
         }
 
         .login-box h2 {
             margin-bottom: 20px;
-            color: #333;
+            color: #ffffff;
             text-align: center;
         }
 
@@ -119,42 +136,49 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
+            font-weight: 500;
+            color: #e0e0e0;
+            font-size: 0.9em;
         }
 
         .form-group input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
+            border: 1px solid #262626;
+            border-radius: 4px;
             font-size: 1em;
             transition: border-color 0.3s ease;
+            background: #0a0a0a;
+            color: #e0e0e0;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #ffffff;
+        }
+
+        .form-group input::placeholder {
+            color: #555;
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 4px;
+            font-weight: 500;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: opacity 0.2s ease;
+            font-size: 0.9em;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
+            opacity: 0.9;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #ffffff;
+            color: #0a0a0a;
             width: 100%;
-            font-size: 1.1em;
         }
 
         .btn-danger {
@@ -173,7 +197,7 @@
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: #666;
             color: white;
         }
 
@@ -245,14 +269,16 @@
         }
 
         .stat-number {
-            font-size: 2em;
+            font-size: 1.4em;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            word-break: break-word;
         }
 
         .stat-label {
             opacity: 0.6;
-            font-size: 0.85em;
+            font-size: 0.8em;
+            line-height: 1.4;
         }
 
         .section {
@@ -279,7 +305,7 @@
         .voter-table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
+            background: #1a1a1a;
             border-radius: 8px;
             overflow: hidden;
         }
@@ -288,27 +314,29 @@
         .voter-table td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #262626;
+            color: #e0e0e0;
         }
 
         .voter-table th {
-            background: #667eea;
-            color: white;
+            background: #0a0a0a;
+            color: #ffffff;
             font-weight: 600;
         }
 
         .voter-table tr:hover {
-            background: #f8f9fa;
+            background: #202020;
         }
 
         .time-badge {
             display: inline-block;
-            background: #e7f3ff;
-            color: #004085;
+            background: #262626;
+            color: #e0e0e0;
             padding: 4px 8px;
             border-radius: 4px;
-            font-size: 0.85em;
+            font-size: 0.75em;
             margin: 2px;
+            white-space: nowrap;
         }
 
         .heatmap-container {
@@ -320,18 +348,19 @@
 
         .heatmap {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 8px;
             min-width: 600px;
         }
 
         .heatmap-cell {
-            padding: 12px;
+            padding: 10px;
             border-radius: 6px;
             text-align: center;
-            font-size: 0.85em;
-            border: 1px solid #e9ecef;
+            font-size: 0.75em;
+            border: 1px solid #262626;
             transition: transform 0.2s ease;
+            background: #1a1a1a;
         }
 
         .heatmap-cell:hover {
@@ -342,6 +371,8 @@
         .heatmap-time {
             font-weight: 600;
             margin-bottom: 4px;
+            font-size: 0.85em;
+            white-space: nowrap;
         }
 
         .heatmap-votes {
